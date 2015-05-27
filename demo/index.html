@@ -1,0 +1,148 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    
+  <title>paper-date-picker demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../paper-styles/paper-styles.html">
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../paper-date-picker.html">
+  <link rel="import" href="../paper-year-picker.html">
+  <link rel="import" href="../paper-date-picker-dialog.html">
+
+  <style is="custom-style">
+
+    body {
+      font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+      font-size: 14px;
+      margin: 0;
+      padding: 24px;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-touch-callout: none;
+    }
+    body > section {
+      width: 300px;
+      margin:20px;
+    }
+    section > div{
+      margin:20px;
+    }
+    
+  </style>
+  
+</head>
+
+<body>
+
+ <div style="background:rgb(255,200,200);padding:20px;">Performance of the Internationalization API is not great and excessively used in this component. After optimization this is acceptable with just a couple of components on a page, but 10 of them on a single page is a bit much for even the quickest of browsers (especially considering two aren't using numbers as we know them). For more information see this <a href="http://jsperf.com/intl-api/3">jspref</a>.</div>
+
+  <section>
+    <div>Date picker</div>
+
+    <br>
+
+    <div>
+      <paper-date-picker></paper-date-picker>
+    </div>    
+
+  </section>
+  
+  <section>
+    <div>Date picker w/ highlighting</div>
+
+    <br>
+
+    <div>
+      <paper-date-picker id="dateHighlightDemo"></paper-date-picker>
+    </div>    
+
+  </section>
+  
+  <section>
+    <div>Year picker</div>
+
+    <br>
+
+    <div>
+      <paper-year-picker></paper-year-picker>
+    </div>    
+
+  </section>
+ 
+  <section>
+    <div>Date picker dialog</div>
+
+    <br>
+     <div style="margin-left:20px;">
+      <paper-date-picker style="width:600px"></paper-date-picker>
+    </div>
+    
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[0].toggle()">Open date picker dialog</paper-button>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog value="2000/1/1"></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[1].toggle()">Open date picker dialog on 1/1/2000</paper-button>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog value="2014/1/1" min="2013/9/1" max="2014/8/31"></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[2].toggle()">Open date picker dialog for academic year 2013-2014</paper-button>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog infinite-scrolling="false"></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[3].toggle()">Open date picker dialog without infinite scrolling</paper-button>
+    </div>
+  </section>
+  
+  <section style="margin-top:20px;">
+    <div>Internationalization</div>
+
+    <br>
+     <div style="margin-left:20px;">
+      <paper-date-picker style="width:600px" locale='["th-TH-u-nu-thai-ca-chinese"]'></paper-date-picker>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog locale='["en-GB"]'></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[4].toggle()">Open UK English date picker</paper-button>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog locale='["en-GB"]' start-day-of-week="1"></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[5].toggle()">Open UK English date picker starting with Monday</paper-button>
+    </div>
+    <div style="margin-left:20px;">
+      <paper-date-picker-dialog locale='["th-TH-u-nu-thai-ca-chinese"]'></paper-date-picker-dialog>
+      <paper-button raised onClick="document.querySelectorAll('paper-date-picker-dialog')[6].toggle()">Open thai-chinese date picker</paper-button>
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      
+      function genDates() {
+        var d1 = new Date(), d2 = new Date();
+        var h = [], x, y;
+        h.push(new Date(d1.getTime()));
+        for (x = 1; x <= 30; x++) {
+          y = Math.floor(Math.sqrt(2 * x));
+          d1.setDate(d1.getDate() + y);
+          d2.setDate(d2.getDate() - y);
+          h.push(new Date(d1.getTime()));
+          h.push(new Date(d2.getTime()));
+        }
+        return h;
+      }
+      
+      document.addEventListener('WebComponentsReady', function() {
+        var highlightCalendar = document.getElementById('dateHighlightDemo');
+        
+        highlightCalendar.highlightDates = genDates();
+      });
+    })();
+  </script>
+
+</body>
+</html>

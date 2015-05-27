@@ -3,6 +3,7 @@ Required for release:
      - Firefox: Performance sluggish, see below
  2. Internationalization. Mostly done, but
      - date preview in picker is always full month, day, full year (which actually looks fine, but goes against the Android implementation)
+ 3. Add unit tests
 
 Would be nice:
  - Optional: Snap-to-month effect

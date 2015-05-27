@@ -1,31 +1,32 @@
 <!--
 Copyright (c) 2014 David Mulder and Benjamin Monjoie
+
+Ported to Polymer 0.9.x by Vartan Simonian 2015
 -->
 
 <!--
 @group Paper Elements
 @element paper-year-picker
-@homepage https://github.com/David-Mulder/paper-date-picker
+@homepage https://github.com/vsimonian/paper-date-picker
 -->
 
 <link href="../polymer/polymer.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
 
-<polymer-element name="paper-year-picker">
-  
-<template>
+<dom-module id="paper-year-picker">
 
-  <style>
+  <style is="custom-style">
   
     :host {
       display: block;
       height: 250px;
-      width:100%;
+      width: 100%;
     }
+    
     #container {
       display: block;
       height: 250px;
-      width:100%;
+      width: 100%;
       overflow: auto;
     }
     
@@ -58,7 +59,8 @@ Copyright (c) 2014 David Mulder and Benjamin Monjoie
     }
     
     .year.selected span {
-      background-color:rgba(0,159,136,.4);
+      background-color: var(--app-primary-color, --paper-teal-500);
+      color: #fff;
       border-radius:100%;
       height: 42px;
       display: inline-block;
@@ -66,106 +68,148 @@ Copyright (c) 2014 David Mulder and Benjamin Monjoie
     }
     
   </style>
+  
+<template>
  
  <div id="container">
-    <template repeat="{{ y in yearArray }}">
-        <!--<paper-button class="year {{ { selected : y == year} | tokenList  }}" on-tap="{{ yearSelected }}" data-year="{{ y }}"><span>{{ y }}</span></paper-button>-->
-        <div class="year {{ { selected : y.n == year} | tokenList  }}" on-tap="{{ yearSelected }}" data-year="{{ y.n }}"><span>{{ y.year }}</span></div>
+    <template is="dom-repeat" items="[[_yearArray]]" as="y">
+        <!--<paper-button class="[[_yearClassName(y, year)]]" on-click="_yearSelected" data-year="[[y]]"><span>[[y]]</span></paper-button>-->
+        <div class$="[[_yearClassName(y, year)]]" on-click="_yearSelected" data-year$="[[y.n]]"><span>[[y.year]]</span></div>
     </template>
   </div>
 
 </template>
 
+</dom-module>
+
 <script>
 (function(){
-  Polymer('paper-year-picker', {
+  Polymer({
+    is: 'paper-year-picker',
     
-    publish: {
+    properties: {
       /**
-       * The currently selected year
+       * Gets or sets the selected year.
        *
        * @attribute year
        * @type integer
-       * @default undefined
+       * @default Current
        */
-      year: undefined,
+      year: {
+        type: Number,
+        value: new Date().getFullYear(),
+        notify: true,
+        observer: '_yearChanged'
+      },
       
       /**
-       * Lowest selectable date (inclusive)
+       * Gets or sets the earliest selectable year (inclusive).
        *
        * @attribute min
-       * @type Date
-       * @default 900
+       * @type integer
+       * @default 1900
        */
-      min: new Date(1900),
+      min: {
+        type: Number,
+        value: 1900
+      },
       
       /**
-       * Highest selectable date (inclusive)
+       * Gets or sets the latest selectable year (inclusive).
        *
        * @attribute max
-       * @type Date
+       * @type integer
        * @default 2100
        */
-      max: new Date(2100),
+      max: {
+        type: Number,
+        value: 2100
+      },
         
       /**
-       * Locale setting per the HTML5 Intl API
+       * Gets or sets the list of locale identifiers for localization using the HTML5 Intl API.
        * 
        * @attribute locale
        * @type Array
-       * @default undefined
+       * @default ['en-US']
        * 
        */
-      locale: undefined
+      locale: {
+        type: Array,
+        value: ['en-US'],
+        observer: '_localeChanged'
+      }
     },
     
-    yearArray: [],
-    // TODO: Why in the world is this a hard coded variable?
-    yearElementHeight: 62,
-    
-    intl:{},
-    
-    localeChanged: function(){
-      this.intl = {};
-      this.intl.year = Intl.DateTimeFormat(this.locale, {year: 'numeric'}).format;
+    _yearClassName: function(y, year) {
+      return 'year' + (y.n == year ? ' selected' : '');
     },
     
-    setYearArray: function() {
-      this.yearArray = [];
-      for (var i = this.min.getFullYear(); i <= this.max.getFullYear(); i++) {
-        this.yearArray.push({
+    _yearArray: [],
+    
+    _intl: {},
+    
+    _localeChanged: function(){
+      if (!this.locale) { return; }
+      this._intl = {};
+      this._intl.year = Intl.DateTimeFormat(this.locale, { year: 'numeric' }).format;
+    },
+    
+    _setYearArray: function() {
+      this._yearArray = [];
+      for (var i = this.min; i <= this.max; i++) {
+        this.push('_yearArray', {
           n:i,
-          year: this.intl.year(new Date(i,1,1))
+          year: this._intl.year(new Date(i,1,1))
         });
       }
     },
     
-    refreshScrollPosition: function(){
-      var that = this;
+    /* Scroll function taken from http://stackoverflow.com/a/16136789/4220785 */
+    _scrollTo: function(element, to, duration) {
+      var start = element.scrollTop, change = to - start, currentTime = 0, increment = 20;
+          
+      var easeInOutQuad = function (t, b, c, d) {
+        t /= d/2;
+        if (t < 1) return c/2*t*t + b;
+        t--;
+        return -c/2 * (t*(t-2) - 1) + b;
+      };
+  
+      var animateScroll = function(){        
+          currentTime += increment;
+          var val = easeInOutQuad(currentTime, start, change, duration);                        
+          element.scrollTop = val; 
+          if(currentTime < duration) {
+              setTimeout(animateScroll, increment);
+          }
+      };
+      animateScroll();
+    },
+    
+    _refreshScrollPosition: function(){
+      var yearElement = this.querySelector('.year');
       setTimeout(function(){
-        that.$.container.scrollTop = (that.year - that.min.getFullYear()+0.5) * that.yearElementHeight - that.$.container.clientHeight/2;
-      },0);
+        this._scrollTo(this.$.container, (this.year - this.min+0.5) * ((yearElement && yearElement.offsetHeight) || 64) - this.$.container.clientHeight/2, 200);
+      }.bind(this),0);
     },
     
-    yearChanged: function() {
-      this.setYearArray();
-      this.refreshScrollPosition();
+    _yearChanged: function() {
+      this._setYearArray();
+      this._refreshScrollPosition();
     },
     
-    yearSelected: function(e) {
-      for(i=0;i<e.path.length;i++){
-        if(e.path[i].dataset && e.path[i].dataset.year){
-          return this.year = parseInt(e.path[i].dataset.year);
-        }
+    _yearSelected: function(e) {
+      if (e.model) {
+        return this.year = e.model.y.year;
       }
     },
     
     ready: function(){
-      this.localeChanged();
+      this._localeChanged();
+      this._yearChanged();
     }
     
   });
 })();
 </script>
-
-</polymer-element>

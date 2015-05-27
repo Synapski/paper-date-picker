@@ -19,6 +19,8 @@ Authors
 
 David Mulder and Benjamin Monjoie at gdg Brussels 2014
 
+Ported to Polymer 0.9.x by Vartan Simonian 2015
+
 License
 ===
 
