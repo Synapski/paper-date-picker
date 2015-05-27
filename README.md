@@ -10,7 +10,7 @@ Installation & docs
 
 Install with `bower` using
 
-    bower install paper-date-picker
+    bower install vsimonian/paper-date-picker#master
     
 Documentation can both be found in `/bower_components/paper-date-picker/` or over [here](http://david-mulder.github.io/polymer-docs/bower_components/paper-date-picker/).
 
