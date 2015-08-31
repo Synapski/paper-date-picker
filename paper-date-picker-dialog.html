@@ -347,7 +347,7 @@ The date picker dialog fires `value-changed` and `selection-changed` events when
     _monthShortName: '',
     _formattedYear: '',
     _year: 0,
-    _page: 0,
+    _page: 1,
     
     _immediateDateChanged: function() {
       this._year = this.immediateDate.getFullYear();
@@ -387,6 +387,7 @@ The date picker dialog fires `value-changed` and `selection-changed` events when
       if(this.immediateDate <= this.max && this.immediateDate >= this.min){
         this.value = this.immediateDate;
         this.fire('value-changed');
+        this._showYearPicker();
       }
     },
     
@@ -429,6 +430,7 @@ The date picker dialog fires `value-changed` and `selection-changed` events when
         this.immediateDate = this.value;
       }
       this._immediateDateChanged();
+      this._showYearPicker();
     }
     
   });
